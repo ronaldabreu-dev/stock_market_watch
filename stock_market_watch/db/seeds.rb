@@ -12,9 +12,24 @@ client = IEX::Api::Client.new(
 )
 
 top_ten = client.stock_market_list(:mostactive)
+puts top_ten[0]
+top_ten.each do |stock|
+  logo = client.logo("#{stock["symbol"]}")
+  news = client.news("#{stock["symbol"]}")
 
-news = client.news('AAPL', 5)
-puts news[0]
+  Stock.create(
+    company_name: stock.company_name,
+    avg_total_volume: stock.avg_total_volume,
+    change_percent: stock.change_percent,
+    latest_price: stock.latest_price,
+    latest_update: stock.latest_update,
+    market_cap: stock.market_cap,
+    pe_ratio: stock.pe_ratio,
+    primary_exchange: stock.primary_exchange,
+    symbol: stock.symbol,
+    ytd_change: stock.ytd_change,
+    news: news,
+    logo_url: logo.url
+)
 
-sectors = client.sectors('MARKET')
-puts sectors
+end
