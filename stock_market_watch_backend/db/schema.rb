@@ -31,7 +31,7 @@ ActiveRecord::Schema.define(version: 2020_07_06_200856) do
     t.string "primary_exchange"
     t.string "symbol"
     t.integer "ytd_change"
-    t.string "news"
+    t.text "news"
     t.string "logo_url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

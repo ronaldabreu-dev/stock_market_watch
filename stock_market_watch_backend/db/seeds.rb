@@ -1,4 +1,5 @@
 require "iex-ruby-client"
+Stock.destroy_all
 IEX::Api.configure do |config|
   config.publishable_token = 'pk_f57a13c9af324593872971b36ca28c8c' # defaults to ENV['IEX_API_PUBLISHABLE_TOKEN']
   config.secret_token = 'sk_d26d6dcd69c54f3e9308330ba8339332' # defaults to ENV['IEX_API_SECRET_TOKEN']
@@ -12,10 +13,10 @@ client = IEX::Api::Client.new(
 )
 
 top_ten = client.stock_market_list(:mostactive)
-puts top_ten[0]
+
 top_ten.each do |stock|
   logo = client.logo("#{stock["symbol"]}")
-  news = client.news("#{stock["symbol"]}", 1)
+  news = client.news("#{stock["symbol"]}", 5)
 
   Stock.create(
     company_name: stock.company_name,
