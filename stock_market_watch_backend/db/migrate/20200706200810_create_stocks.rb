@@ -11,7 +11,7 @@ class CreateStocks < ActiveRecord::Migration[6.0]
       t.string :primary_exchange
       t.string :symbol
       t.integer :ytd_change
-      t.string :news
+      t.text :news
       t.string :logo_url
       t.timestamps
     end
