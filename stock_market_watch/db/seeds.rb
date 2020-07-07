@@ -15,7 +15,7 @@ top_ten = client.stock_market_list(:mostactive)
 puts top_ten[0]
 top_ten.each do |stock|
   logo = client.logo("#{stock["symbol"]}")
-  news = client.news("#{stock["symbol"]}")
+  news = client.news("#{stock["symbol"]}", 1)
 
   Stock.create(
     company_name: stock.company_name,
