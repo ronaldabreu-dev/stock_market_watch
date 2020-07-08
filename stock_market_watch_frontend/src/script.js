@@ -5,13 +5,40 @@ document.addEventListener("DOMContentLoaded", function(e){
     if(e.target.textContent === "On The Move"){
       stockCollection.innerHTML = ""
       getStocks()
-      
     } else if (e.target.textContent === "Sign up"){
       console.log("SignUp")
     } else if (e.target.textContent === "Log in"){
 
     } else if (e.target.value === "go"){
       
+    } else if (e.target.className === "show-info"){
+      console.log(e.target.parentNode.dataset.news)
+      const stockDiv = e.target.parentNode
+      const stockData = e.target.parentNode.dataset
+      const moreInfo = document.createElement('div')
+      const stockNewsUl = document.querySelector(".stock-news")
+      moreInfo.className = "more-info"
+      moreInfo.innerHTML = `
+        <p>Total volume: ${stockData.avg_total_volume}</p>
+        <p>Change percent: ${stockData.change_percent}</p>
+        <p>Latest price: ${stockData.latest_price}</p>
+        <p>Latest update: ${stockData.latest_update}</p>
+        <p>Market cap: ${stockData.market_cap}</p>
+        <p>P/E ratio: ${stockData.pe_ratio}</p>
+        <p>Primary exchange: ${stockData.primary_exchange}</p>
+        <p>Symbol: ${stockData.symbol}</p>
+        <p>YTD change: ${stockData.ytd_change}</p>
+        <p>News: ${stockData.news}</p>
+      `
+      stockDiv.append(moreInfo)
+      // stockDiv.append(stockNewsUl)
+      e.target.className = "hide-info"
+      e.target.textContent = "Hide Info"
+    } else if (e.target.className === "hide-info"){
+      const moreInfo = document.querySelector(".more-info")
+      moreInfo.remove()
+      e.target.className = "show-info"
+      e.target.textContent = "Show Info"
     }
   })
 
@@ -35,22 +62,26 @@ document.addEventListener("DOMContentLoaded", function(e){
       const stockDiv = document.createElement('div')
       const stockImg = document.createElement('img')
       const stockNewsUl = document.createElement('ul')
+      stockNewsUl.className = "stock-news"
 
     stockImg.src = stock.logo_url
     stockImg.setAttribute("class", "company_logo")
     stockDiv.innerHTML = `
     <h1>${stock.company_name}</h1><br>
-    <b>avg total volume:</b> ${stock.avg_total_volume}<br>
-    <b>change percent:</b> ${stock.change_percent}<br>
-    <b>latest price:</b> ${stock.latest_price}<br>
-    <b>latest update:</b> ${stock.latest_update}<br>
-    <b>market cap:</b> ${stock.market_cap}<br>
-    <b>pe ratio:</b> ${stock.pe_ratio}<br>
-    <b>primary exchange:</b> ${stock.primary_exchange}<br>
-    <b>symbol:</b> ${stock.symbol}<br>
-    <b>ytd change:</b> ${stock.ytd_change}<br>
-    <b>news:</b><br>
- `
+    <button class="show-info">Show Info</button>
+    `
+    stockDiv.className = "each-stock"
+    stockDiv.dataset.avg_total_volume = `${stock.avg_total_volume}`
+    stockDiv.dataset.change_percent = `${stock.change_percent}`
+    stockDiv.dataset.latest_price = `${stock.latest_price}`
+    stockDiv.dataset.latest_update = `${stock.latest_update}`
+    stockDiv.dataset.market_cap = `${stock.market_cap}`
+    stockDiv.dataset.pe_ratio = `${stock.pe_ratio}`
+    stockDiv.dataset.primary_exchange = `${stock.primary_exchange}`
+    stockDiv.dataset.symbol = `${stock.symbol}`
+    stockDiv.dataset.ytd_change = `${stock.ytd_change}`
+    // stockDiv.dataset.news = `${stockNewsUl}`
+
       stockDiv.prepend(stockImg)
 
         newsArray = stock.news.split("#<IEX::Resources::News ")
@@ -78,6 +109,7 @@ document.addEventListener("DOMContentLoaded", function(e){
                stockNewsUl.append(li)
 
         })
+        
         stockDiv.append(stockNewsUl)
         stockCollection.append(stockDiv)
 
