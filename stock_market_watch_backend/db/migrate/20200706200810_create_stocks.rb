@@ -1,17 +1,17 @@
 class CreateStocks < ActiveRecord::Migration[6.0]
   def change
     create_table :stocks do |t|
-      t.integer :avg_total_volume
-      t.integer :change_percent
+      t.float :avg_total_volume
+      t.float :change_percent
       t.string :company_name
-      t.integer :latest_price
-      t.integer :latest_update
-      t.integer :market_cap
-      t.integer :pe_ratio
+      t.float :latest_price
+      t.float :latest_update
+      t.float :market_cap
+      t.float :pe_ratio
       t.string :primary_exchange
       t.string :symbol
-      t.integer :ytd_change
-      t.text :news
+      t.float :ytd_change
+      t.string :news
       t.string :logo_url
       t.timestamps
     end

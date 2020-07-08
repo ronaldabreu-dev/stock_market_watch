@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function(e){
   }
 
     function renderStocks(stocks){
+      stock
       stocks.forEach(stock =>{
                   renderStock(stock)
               })
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function(e){
     <b>latest price:</b> ${stock.latest_price}<br>
     <b>latest update:</b> ${stock.latest_update}<br>
     <b>market cap:</b> ${stock.market_cap}<br>
-    <b>pe ratio:</b> ${stock.pe_ratio}
+    <b>pe ratio:</b> ${stock.pe_ratio}<br>
     <b>primary exchange:</b> ${stock.primary_exchange}<br>
     <b>symbol:</b> ${stock.symbol}<br>
     <b>ytd change:</b> ${stock.ytd_change}<br>
