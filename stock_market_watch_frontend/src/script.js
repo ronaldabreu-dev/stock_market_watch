@@ -1,4 +1,20 @@
 document.addEventListener("DOMContentLoaded", function(e){
+
+  document.addEventListener("click", function(e){
+    e.preventDefault()
+    if(e.target.textContent === "On The Move"){
+      stockCollection.innerHTML = ""
+      getStocks()
+      
+    } else if (e.target.textContent === "Sign up"){
+      console.log("SignUp")
+    } else if (e.target.textContent === "Log in"){
+
+    } else if (e.target.value === "go"){
+      
+    }
+  })
+
     const stocksUrl = "http://localhost:3000/api/v1/stocks"
     const stockCollection = document.querySelector("#stock-collection")
 
@@ -68,6 +84,6 @@ document.addEventListener("DOMContentLoaded", function(e){
 
     }
 
-getStocks()
+
 
 })
