@@ -1,3 +1,6 @@
+.search{
+ float: right;
+}
 .company_logo {
     width: auto;
     height: auto;
@@ -10,3 +13,21 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+ul {
+   background-color: #e1f2fb;
+ }
+
+ ul li {
+
+   padding: 20px;
+   color: black;
+  display: inline-block;
+   margin-left: 4%;
+   margin-right: 4%;
+ }
+
+ li:hover {
+   background-color: #f8cf26;
+   transition-duration: 1s;
+ }
