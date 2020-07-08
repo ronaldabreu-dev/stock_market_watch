@@ -1,4 +1,12 @@
-img { 
-    width: 100px; 
+.company_logo {
+    width: auto;
     height: auto;
+}
+
+.logo {
+  width: 500px;
+  height: 500px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }

@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", function(e){
   }
 
     function renderStocks(stocks){
-      stock
       stocks.forEach(stock =>{
                   renderStock(stock)
               })
@@ -22,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function(e){
       const stockNewsUl = document.createElement('ul')
 
     stockImg.src = stock.logo_url
-
+    stockImg.setAttribute("class", "company_logo")
     stockDiv.innerHTML = `
     <h1>${stock.company_name}</h1><br>
     <b>avg total volume:</b> ${stock.avg_total_volume}<br>
