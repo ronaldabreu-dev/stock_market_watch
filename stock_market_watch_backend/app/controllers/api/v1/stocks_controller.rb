@@ -15,15 +15,13 @@ class Api::V1::StocksController < ApplicationController
 
 
   def index
-    stocks = Stock.all
-
-    render json: stocks
+    top_ten = @@client.stock_market_list(:mostactive)
+    render json: top_ten
   end
 
   def show
-    # stock = Stock.find(params[:id])
     logo = @@client.logo("#{params[:id]}")
-    render json: logo
+    render json: logo.url
   end
 
 end

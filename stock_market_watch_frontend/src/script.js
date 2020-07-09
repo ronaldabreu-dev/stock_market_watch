@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function(e){
   const stocksUrl = "http://localhost:3000/api/v1/stocks"
   const stockCollection = document.querySelector("#stock-collection")
-  const searchImg = document.createElement('img')
   const navBarUl = document.querySelector('.navBarUl')
   const searchInput = document.getElementById("search-input")
   let userName = ""
@@ -111,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function(e){
    .then(data => {
      renderStocks(data)
   })
-    console.log(userName)
+
  }
 
  function renderUserPage(userName){
@@ -164,20 +163,22 @@ document.addEventListener("DOMContentLoaded", function(e){
     }
 
  function getStock(stockSymbol){
-      const stockUrl = `https://cloud.iexapis.com/stable/stock/${stockSymbol}/batch?types=quote,news&range=1m&last=10&token=pk_f57a13c9af324593872971b36ca28c8c`
+      const stockUrl = `https://cloud.iexapis.com/stable/stock/${stockSymbol}/batch?types=quote,news,logo&range=1m&last=10&token=pk_f57a13c9af324593872971b36ca28c8c`
       fetch(stockUrl)
       .then(response => response.json())
       .then(data => {
+        console.log(data)
         renderSearch(data)
      })
     }
 
  function renderSearch(stock){
+     const searchImg = document.createElement('img')
       let stockDiv = document.createElement('div')
       let stockNewsUl = document.createElement('ul')
           setStockImage(stock.quote.symbol)
-      // searchImg.setAttribute("class", "company_logo")
-
+       searchImg.setAttribute("class", "company_logo")
+       searchImg.src = stock.logo.url
          console.log(searchImg)
         stockDiv.setAttribute("class", "each-stock")
         stockDiv.innerHTML = `
@@ -202,11 +203,15 @@ document.addEventListener("DOMContentLoaded", function(e){
     }
 
  function setStockImage(stockSymbol){
+  let stock = document.getElementById(`${stockSymbol}`)
+  let stockImg = document.createElement('img')
       fetch(`http://localhost:3000/api/v1/stocks/${stockSymbol}`)
-       .then(response => response.json())
+       .then(response => response)
        .then(data => {
-         searchImg.setAttribute("src", `${data.url}`)
+          stockImg.src = data.url
+          stock.prepend(stockImg)
        })
+
     }
 
  function getStocks(){fetch(stocksUrl)
@@ -218,18 +223,19 @@ document.addEventListener("DOMContentLoaded", function(e){
 
  function renderStocks(stocks){
       stocks.forEach(stock =>{
-                  renderStock(stock)
+
+           renderStock(stock)
               })
     }
 
  function renderStock(stock){
       const stockDiv = document.createElement('div')
-      const stockImg = document.createElement('img')
 
+      // stockImg.src = img.url
       // stockNewsUl.className = "stock-news"
+    // stockImg.src = stock.logo_url
+    // stockImg.setAttribute("class", "company_logo")
 
-    stockImg.src = stock.logo_url
-    stockImg.setAttribute("class", "company_logo")
     stockDiv.innerHTML = `
     <h1>${stock.company_name}</h1><br>
     <button class="show-info">Show Info</button>
@@ -245,14 +251,11 @@ document.addEventListener("DOMContentLoaded", function(e){
     stockDiv.dataset.symbol = `${stock.symbol}`
     stockDiv.dataset.ytd_change = `${stock.ytd_change}`
     stockDiv.dataset.news = `${stock.news}`
-
-      stockDiv.prepend(stockImg)
-
-
-
+    stockDiv.setAttribute(`id`, `${stock.symbol}`)
+    // stockDiv.prepend(stockImg)
         // stockDiv.append(stockNewsUl)
         stockCollection.append(stockDiv)
-
+        setStockImage(stock.symbol)
 
     }
 
