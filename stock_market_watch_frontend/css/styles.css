@@ -1,5 +1,5 @@
 .search{
- float: right;
+    text-align: left;
 }
 .company_logo {
     width: auto;
@@ -19,12 +19,12 @@ ul {
  }
 
  ul li {
-
+font-family: "Helvetica", sans-serif;
    padding: 20px;
    color: black;
   display: inline-block;
    margin-left: 4%;
-   margin-right: 4%;
+   margin-right: 1%;
  }
 
  li:hover {
