@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", function(e){
+  const stocksUrl = "http://localhost:3000/api/v1/stocks"
+  const stockCollection = document.querySelector("#stock-collection")
+  const searchImg = document.createElement('img')
 
   document.addEventListener("click", function(e){
     e.preventDefault()
@@ -10,7 +13,9 @@ document.addEventListener("DOMContentLoaded", function(e){
     } else if (e.target.textContent === "Log in"){
 
     } else if (e.target.value === "go"){
-      
+      e.preventDefault()
+       const searchInput = document.getElementById("search-input")
+       getStock(searchInput.value)
     } else if (e.target.className === "show-info"){
       console.log(e.target.parentNode.dataset.news[0])
       const stockDiv = e.target.parentNode
@@ -69,8 +74,53 @@ document.addEventListener("DOMContentLoaded", function(e){
     }
   })
 
-    const stocksUrl = "http://localhost:3000/api/v1/stocks"
-    const stockCollection = document.querySelector("#stock-collection")
+    function getStock(stockSymbol){
+      const stockUrl = `https://cloud.iexapis.com/stable/stock/${stockSymbol}/batch?types=quote,logo,news&range=1m&last=10&token=pk_f57a13c9af324593872971b36ca28c8c`
+      fetch(stockUrl)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        renderSearch(data)
+     })
+    }
+
+    function renderSearch(stock){
+      let stockDiv = document.createElement('div')
+      let stockNewsUl = document.createElement('ul')
+          setStockImage(stock.quote.symbol)
+          // console.log(stock)
+      // searchImg.setAttribute("class", "company_logo")
+
+         console.log(searchImg)
+        stockDiv.setAttribute("class", "each-stock")
+        stockDiv.innerHTML = `
+        <h1>${stock.quote.companyName}</h1><br>
+        <b>avg total volume:</b> ${stock.quote.avgTotalVolume}<br>
+        <b>change percent:</b> ${stock.quote.changePercent}<br>
+        <b>latest price:</b> ${stock.quote.latestPrice}<br>
+        <b>latest update:</b> ${stock.quote.latestTime}<br>
+        <b>market cap:</b> ${stock.quote.marketCap}<br>
+        <b>pe ratio:</b> ${stock.quote.peRatio}<br>
+        <b>primary exchange:</b> ${stock.quote.primaryExchange}<br>
+        <b>symbol:</b> ${stock.quote.symbol}<br>
+        <b>week52High:</b> ${stock.quote.week52High}<br>
+        <b>week52Low:</b> ${stock.quote.week52Low}<br>
+        <b>ytd change:</b> ${stock.quote.ytdChange}<br>
+        <b>news:</b><br>
+        `
+        stockDiv.prepend(searchImg)
+        stockCollection.innerHTML = "<ul></ul>"
+        stockCollection.append(stockDiv)
+
+    }
+
+    function setStockImage(stockSymbol){
+      fetch(`http://localhost:3000/api/v1/stocks/${stockSymbol}`)
+       .then(response => response.json())
+       .then(data => {
+         searchImg.setAttribute("src", `${data.url}`)
+       })
+    }
 
   function getStocks(){fetch(stocksUrl)
     .then(response => response.json())
@@ -88,14 +138,12 @@ document.addEventListener("DOMContentLoaded", function(e){
     function renderStock(stock){
       const stockDiv = document.createElement('div')
       const stockImg = document.createElement('img')
-      
       // stockNewsUl.className = "stock-news"
 
     stockImg.src = stock.logo_url
-    stockImg.setAttribute("class", "company_logo")
+    stockImg.setAttribute("class", "show-info")
     stockDiv.innerHTML = `
     <h1>${stock.company_name}</h1><br>
-    <button class="show-info">Show Info</button>
     `
     stockDiv.className = "each-stock"
     stockDiv.dataset.avg_total_volume = `${stock.avg_total_volume}`
