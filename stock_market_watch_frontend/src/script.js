@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function(e){
 
     } else if (e.target.id === "logOut") {
 
-      console.log("logout")
+      logOut(userName)
 
     } else if (e.target.id === "logIn") {
       e.preventDefault()
@@ -133,41 +133,67 @@ document.addEventListener("DOMContentLoaded", function(e){
                 tracker(e)
     }
 
-
-    function tracker(e){
-          const stockDataArray = e.target.parentNode.childNodes[15].innerText.split(": ");
-           console.log(stockDataArray)
-           let stockObj = {}
-           let x = []
-          stockObj[`"symbol"`] = stockDataArray[1]
-          stockObj[`"user_name"`] = userName
-          fetch("http://localhost:3000/api/v1/user_stocks",{
-          method: "POST",
-          headers: {
-          'Content-Type' : 'application/json'
-            },
-          body: JSON.stringify({
-               stockObj
-          })
-        })
-         .then(response => response.json())
-         .then(data => {
-                console.log('Success:', data);
-                stockCollection.innerHTML = ""
-                data.forEach(i => {
-                  getStock(i["symbol"])
-                  console.log(i["symbol"])
-                  x.push(i)
-                });
-
-           })
-         .catch((error) => {
-           console.error('Error:', error);
-         })
-        console.log(x)
-     }
   })
+function logOut(userName){
+  fetch("http://localhost:3000/api/v1/sessions",{
+  method: "DELETE",
+  headers: {
+  'Content-Type' : 'application/json'
+    },
+  body: JSON.stringify({
+    "name": userName,
+    "password": userPassword
+  })
+})
+ .then(response => response.json())
+ .then(data => {
+   console.log(data);
+     if(data[0] === "wrong password or username"){
+       renderForm("signIn")
+       form = document.querySelector(".form")
+       form.innerHTML += `<br><h3style="text-align:center">${data[0]}<h3>`
+     } else {
+       console.log('Success:', data);
+        location.reload();
+      }
+   })
+ .catch((error) => {
+   console.error('Error:', error);
+ })
 
+}
+function tracker(e){
+        const stockDataArray = e.target.parentNode.childNodes[15].innerText.split(": ");
+         console.log(stockDataArray)
+         let stockObj = {}
+         let x = []
+        stockObj[`"symbol"`] = stockDataArray[1]
+        stockObj[`"user_name"`] = userName
+        fetch("http://localhost:3000/api/v1/user_stocks",{
+        method: "POST",
+        headers: {
+        'Content-Type' : 'application/json'
+          },
+        body: JSON.stringify({
+             stockObj
+        })
+      })
+       .then(response => response.json())
+       .then(data => {
+              console.log('Success:', data);
+              stockCollection.innerHTML = ""
+              data.forEach(i => {
+                getStock(i["symbol"])
+                console.log(i["symbol"])
+                x.push(i)
+              });
+
+         })
+       .catch((error) => {
+         console.error('Error:', error);
+       })
+      console.log(x)
+   }
 
 function signUp(userName, userPassword){
   fetch("http://localhost:3000/api/v1/users",{
@@ -201,6 +227,7 @@ function signUp(userName, userPassword){
    console.error('Error:', error);
  })
 }
+
 function setSession(userName, userPassword){
   fetch("http://localhost:3000/api/v1/sessions",{
   method: "POST",
@@ -231,7 +258,7 @@ function setSession(userName, userPassword){
 
 }
 
- function getUser(){
+function getUser(){
    user = {}
    stockCollection.innerHTML = ""
    const userStocksUrl = `http://localhost:3000/api/v1/users/${userName}`
@@ -246,7 +273,7 @@ function setSession(userName, userPassword){
    })
  }
 
- function renderUserPage(userName, userStocks){
+function renderUserPage(userName, userStocks){
    console.log(userName)
    console.log(userStocks.length)
    stockCollection.innerHTML = `<h3>Welcome ${userName}!`
@@ -276,7 +303,7 @@ function setSession(userName, userPassword){
 
 }
 
- function renderForm(s){
+function renderForm(s){
       e.preventDefault()
 
       stockCollection.innerHTML = ""
@@ -301,7 +328,7 @@ function setSession(userName, userPassword){
       stockCollection.append(signUpdiv)
     }
 
- function getStock(stockSymbol){
+function getStock(stockSymbol){
 
       const stockUrl = `https://cloud.iexapis.com/stable/stock/${stockSymbol}/batch?types=quote,news,logo&range=1m&last=10&token=pk_f57a13c9af324593872971b36ca28c8c`
       fetch(stockUrl)
@@ -352,7 +379,7 @@ function renderUserStocks(stock){
            stockCollection.append(userStocksUl)
 
        }
- function renderSearch(stock){
+function renderSearch(stock){
     stockCollection.innerHTML = ""
 
      let searchImg = document.createElement('img')
@@ -384,7 +411,7 @@ function renderUserStocks(stock){
 
     }
 
- function setStockImage(stockSymbol){
+function setStockImage(stockSymbol){
   let stock = document.getElementById(`${stockSymbol}`)
   let stockImg = document.createElement('img')
       fetch(`http://localhost:3000/api/v1/stocks/${stockSymbol}`)
@@ -396,14 +423,14 @@ function renderUserStocks(stock){
 
     }
 
- function getStocks(){fetch(stocksUrl)
+function getStocks(){fetch(stocksUrl)
     .then(response => response.json())
     .then(data => {
         renderStocks(data)
     })
   }
 
- function renderStocks(stocks){
+function renderStocks(stocks){
    console.log(stocks)
    if(Array.isArray(stocks)){
      stocks.forEach(stock =>{
@@ -414,7 +441,7 @@ function renderUserStocks(stock){
    }
   }
 
- function renderStock(stock){
+function renderStock(stock){
     const stockDiv = document.createElement('div')
     button = document.createElement("button")
     button.setAttribute("type", "submit")

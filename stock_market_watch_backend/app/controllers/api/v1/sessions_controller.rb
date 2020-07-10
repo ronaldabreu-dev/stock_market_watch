@@ -1,10 +1,11 @@
 class Api::V1::SessionsController < ApplicationController
  skip_before_action :auth_user, only: [:new, :create]
 
-  def logout
+  def destroy
+    user = User.find_by(name: params[:session][:name])
     session.delete(:user_id)
 
-    redirect_to new_login_path
+    render json: "You have been logged out"
   end
 
   def new
