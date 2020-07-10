@@ -15,10 +15,15 @@ class Api::V1::UserStocksController < ApplicationController
 
 def create
   @current_user = User.find_by(name: params[:stockObj][:"\"user_name\""])
-  @stock = Stock.create(symbol: params[:stockObj][:"\"symbol\""])
+ if @current_user.stocks.map{|s| s.symbol}.include?(params[:stockObj][:"\"symbol\""])
 
+    render json: {"message": "Already tracking!"}
+  else
+  @stock = Stock.create(symbol: params[:stockObj][:"\"symbol\""])
   @current_user.stocks.push(@stock)
   render json: @current_user.stocks
+  end
+
 end
 
 def show
