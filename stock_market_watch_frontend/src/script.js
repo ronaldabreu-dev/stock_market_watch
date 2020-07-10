@@ -130,10 +130,13 @@ document.addEventListener("DOMContentLoaded", function(e){
       setSession(userName, userPassword)
 
     } else if (e.target.id === "trackButton") {
-                e.target.value = "Stop Tracking"
+               console.log(e.target)
+                e.target.textContent = "Stop Tracking"
                 tracker(e)
+    } else if (e.target.id === "searchtrackButton") {
+        e.target.textContent = "Stop Tracking"
+            searchtracker(e)
     }
-
   })
 function renderNews(newsArray){
   const stockNewsUl = document.createElement('ul')
@@ -185,8 +188,8 @@ function logOut(userName){
 function searchtracker(e){
         let stockObj = {}
          let x = []
-         console.log()
-        stockObj[`"symbol"`] = searchInput.value
+         symbol = e.target.parentNode.parentNode.childNodes[34].textContent
+        stockObj[`"symbol"`] = symbol
         stockObj[`"user_name"`] = userName
         console.log(stockObj)
         fetch("http://localhost:3000/api/v1/user_stocks",{
@@ -468,7 +471,7 @@ function renderSearch(stock){
         stockCollection.append(userStocksUl)
         button = document.createElement("button")
         button.setAttribute("type", "submit")
-        button.setAttribute("id", "trackButton")
+        button.setAttribute("id", "searchtrackButton")
         button.textContent = "Start Tracking"
         button.addEventListener("click", function(e){
             searchtracker(e)
