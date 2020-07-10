@@ -335,7 +335,7 @@ function getUser(){
 function renderUserPage(userName, userStocks){
    console.log(userName)
    console.log(userStocks.length)
-   stockCollection.innerHTML = `<h3>Welcome ${userName}!`
+   stockCollection.innerHTML = `<h1 style="color:#f8cf26">Welcome ${userName}!<h1>`
    stockCollection.setAttribute("id", "myStocks")
 
    const myStocks = document.createElement("li")
