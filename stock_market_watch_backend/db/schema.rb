@@ -21,18 +21,7 @@ ActiveRecord::Schema.define(version: 2020_07_06_200856) do
   end
 
   create_table "stocks", force: :cascade do |t|
-    t.float "avg_total_volume"
-    t.float "change_percent"
-    t.string "company_name"
-    t.float "latest_price"
-    t.float "latest_update"
-    t.float "market_cap"
-    t.float "pe_ratio"
-    t.string "primary_exchange"
     t.string "symbol"
-    t.float "ytd_change"
-    t.string "news"
-    t.string "logo_url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

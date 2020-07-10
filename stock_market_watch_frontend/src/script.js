@@ -108,7 +108,40 @@ document.addEventListener("DOMContentLoaded", function(e){
       setSession(userName, userPassword)
 
     } else if (e.target.id === "trackButton") {
-          
+          const stockDataArray = e.target.parentNode.childNodes[15].innerText.split(": ");
+           console.log(stockDataArray)
+           let stockObj = {}
+          stockObj[`"symbol"`] = stockDataArray[1]
+          stockObj[`"user_name"`] = userName
+          fetch("http://localhost:3000/api/v1/user_stocks",{
+          method: "POST",
+          headers: {
+          'Content-Type' : 'application/json'
+            },
+          body: JSON.stringify({
+               stockObj
+          })
+        })
+         .then(response => response)
+         .then(data => {
+           console.log(data);
+           errors = []
+             if(Array.isArray(data)){
+               renderForm("signUp")
+               current_stock = document.selectElementbyId(`#${stockObj.Symbol}`)
+                data.forEach(e => {
+                  console.log(e)
+                  errors.push(" " + e)
+                });
+               current_stock.innerHTML += errors
+             } else {
+               console.log('Success:', data);
+               // setSession(userName, userPassword)
+      }
+           })
+         .catch((error) => {
+           console.error('Error:', error);
+         })
     }
   })
 function signUp(userName, userPassword){
