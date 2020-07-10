@@ -18,11 +18,14 @@ def create
   @stock = Stock.create(symbol: params[:stockObj][:"\"symbol\""])
 
   @current_user.stocks.push(@stock)
+  render json: @current_user.stocks
+end
 
-  p params[:stockObj][:"\"symbol\""]
-  p params[:stockObj][:"\"user_name\""]
+def show
+  @current_user = User.find_by(name: params[:id])
+ # @current_user = User.find_by(name: params[:stockObj][:"\"user_name\""])
 
-  # @current_user.stocks.push(stock)
+ render json: @current_user.stocks
 end
 # {"\"symbol\""=>"AMD", "\"user_name\""=>"Ronal
 # d"} permitted: true>

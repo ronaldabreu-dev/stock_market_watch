@@ -75,7 +75,6 @@ document.addEventListener("DOMContentLoaded", function(e){
         button.setAttribute("type", "submit")
         button.setAttribute("id", "trackButton")
         button.textContent = "Start Tracking"
-        console.log(stockDiv)
         stockDiv.childNodes[6].append(button)
       }
        console.log(stockCollection.id)
@@ -94,8 +93,31 @@ document.addEventListener("DOMContentLoaded", function(e){
            signUp(userName, userPassword)
 
     } else if (e.target.id === "myStocks") {
+      console.log(e.target.parentNode.childNodes)
 
-        getUser()
+       let stockObj = {}
+       let x = []
+      stockObj[`"user_name"`] = userName
+      fetch(`http://localhost:3000/api/v1/user_stocks/${userName}`,{
+      headers: {
+      'Content-Type' : 'application/json'
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+            console.log('Success:', data);
+            stockCollection.innerHTML = ""
+            data.forEach(i => {
+              getUserStock(i["symbol"])
+              console.log(i["symbol"])
+              x.push(i)
+            });
+
+       })
+      .catch((error) => {
+       console.error('Error:', error);
+      })
+      console.log(x)
 
     } else if (e.target.id === "logOut") {
 
@@ -108,9 +130,15 @@ document.addEventListener("DOMContentLoaded", function(e){
       setSession(userName, userPassword)
 
     } else if (e.target.id === "trackButton") {
+                tracker(e)
+    }
+
+
+    function tracker(e){
           const stockDataArray = e.target.parentNode.childNodes[15].innerText.split(": ");
            console.log(stockDataArray)
            let stockObj = {}
+           let x = []
           stockObj[`"symbol"`] = stockDataArray[1]
           stockObj[`"user_name"`] = userName
           fetch("http://localhost:3000/api/v1/user_stocks",{
@@ -122,28 +150,25 @@ document.addEventListener("DOMContentLoaded", function(e){
                stockObj
           })
         })
-         .then(response => response)
+         .then(response => response.json())
          .then(data => {
-           console.log(data);
-           errors = []
-             if(Array.isArray(data)){
-               renderForm("signUp")
-               current_stock = document.selectElementbyId(`#${stockObj.Symbol}`)
-                data.forEach(e => {
-                  console.log(e)
-                  errors.push(" " + e)
+                console.log('Success:', data);
+                stockCollection.innerHTML = ""
+                data.forEach(i => {
+                  getStock(i["symbol"])
+                  console.log(i["symbol"])
+                  x.push(i)
                 });
-               current_stock.innerHTML += errors
-             } else {
-               console.log('Success:', data);
-               // setSession(userName, userPassword)
-      }
+
            })
          .catch((error) => {
            console.error('Error:', error);
          })
-    }
+        console.log(x)
+     }
   })
+
+
 function signUp(userName, userPassword){
   fetch("http://localhost:3000/api/v1/users",{
   method: "POST",
@@ -211,11 +236,14 @@ function setSession(userName, userPassword){
    stockCollection.innerHTML = ""
    const userStocksUrl = `http://localhost:3000/api/v1/users/${userName}`
    fetch(userStocksUrl)
-   .then(response => response.json())
+   .then(response => response)
    .then(data => {
      console.log(data)
-     renderStocks(data.stocks)
-  })
+     stockCollection.innerHTML = ""
+     data.forEach(i => {
+       getStock(i["symbol"])
+     })
+   })
  }
 
  function renderUserPage(userName, userStocks){
@@ -244,7 +272,7 @@ function setSession(userName, userPassword){
    navBarUl.prepend(logOut)
    navBarUl.prepend(onTheMove)
    navBarUl.prepend(myStocks)
-    renderStocks(userStocks)
+    renderUserStocks(userStocks)
 
 }
 
@@ -274,6 +302,7 @@ function setSession(userName, userPassword){
     }
 
  function getStock(stockSymbol){
+
       const stockUrl = `https://cloud.iexapis.com/stable/stock/${stockSymbol}/batch?types=quote,news,logo&range=1m&last=10&token=pk_f57a13c9af324593872971b36ca28c8c`
       fetch(stockUrl)
       .then(response => response.json())
@@ -283,10 +312,52 @@ function setSession(userName, userPassword){
      })
     }
 
+function getUserStock(stockSymbol){
+
+         const stockUrl = `https://cloud.iexapis.com/stable/stock/${stockSymbol}/batch?types=quote,news,logo&range=1m&last=10&token=pk_f57a13c9af324593872971b36ca28c8c`
+         fetch(stockUrl)
+         .then(response => response.json())
+         .then(data => {
+           console.log(data)
+           renderUserStocks(data)
+        })
+       }
+
+function renderUserStocks(stock){
+        let searchImg = document.createElement('img')
+         let stockDiv = document.createElement('div')
+         let userStocksUl = document.createElement('ul')
+             setStockImage(stock.quote.symbol)
+          searchImg.setAttribute("class", "company_logo")
+          searchImg.src = stock.logo.url
+            console.log(searchImg)
+           stockDiv.setAttribute("class", "each-stock")
+           stockDiv.innerHTML = `
+           <h1>${stock.quote.companyName}</h1><br>
+           <b>avg total volume:</b> ${stock.quote.avgTotalVolume}<br>
+           <b>change percent:</b> ${stock.quote.changePercent}<br>
+           <b>latest price:</b> ${stock.quote.latestPrice}<br>
+           <b>latest update:</b> ${stock.quote.latestTime}<br>
+           <b>market cap:</b> ${stock.quote.marketCap}<br>
+           <b>pe ratio:</b> ${stock.quote.peRatio}<br>
+           <b>primary exchange:</b> ${stock.quote.primaryExchange}<br>
+           <b>symbol:</b> ${stock.quote.symbol}<br>
+           <b>week52High:</b> ${stock.quote.week52High}<br>
+           <b>week52Low:</b> ${stock.quote.week52Low}<br>
+           <b>ytd change:</b> ${stock.quote.ytdChange}<br>
+           <b>news:</b><br>
+           `
+           stockDiv.prepend(searchImg)
+           userStocksUl.append(stockDiv)
+           stockCollection.append(userStocksUl)
+
+       }
  function renderSearch(stock){
-     const searchImg = document.createElement('img')
+    stockCollection.innerHTML = ""
+
+     let searchImg = document.createElement('img')
       let stockDiv = document.createElement('div')
-      let stockNewsUl = document.createElement('ul')
+      let userStocksUl = document.createElement('ul')
           setStockImage(stock.quote.symbol)
        searchImg.setAttribute("class", "company_logo")
        searchImg.src = stock.logo.url
@@ -308,8 +379,8 @@ function setSession(userName, userPassword){
         <b>news:</b><br>
         `
         stockDiv.prepend(searchImg)
-        stockCollection.innerHTML = "<ul></ul>"
-        stockCollection.append(stockDiv)
+        userStocksUl.append(stockDiv)
+        stockCollection.append(userStocksUl)
 
     }
 
