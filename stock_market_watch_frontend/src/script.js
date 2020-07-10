@@ -4,42 +4,46 @@ document.addEventListener("DOMContentLoaded", function(e){
   const navBarUl = document.querySelector('.navBarUl')
   const searchInput = document.getElementById("search-input")
   let userName = ""
+  let userPassword = ""
   document.addEventListener("click", function(e){
     e.preventDefault()
-    if(e.target.id === "onTheMove"){
+
+    if (e.target.id === "onTheMove"){
       stockCollection.innerHTML = ""
+      stockCollection.setAttribute("id", "onTheMove")
       getStocks()
+
     } else if (e.target.textContent === "Sign up"){
-      console.log("SignUp")
-      renderSignUp()
+
+      renderForm("signUp")
+
     } else if (e.target.textContent === "Log in"){
 
-    } else if (e.target.value === "go"){
+       renderForm("logIn")
+
+    } else if (e.target.id === "searchButton"){
+
       e.preventDefault()
        getStock(searchInput.value)
+
     } else if (e.target.className === "show-info"){
       const stockDiv = e.target.parentNode
       const stockData = e.target.parentNode.dataset
       const moreInfo = document.createElement('div')
       const stockNewsUl = document.createElement('ul')
-      moreInfo.className = "more-info"
 
+      moreInfo.className = "more-info"
+        e.target.textContent = "Hide Market Data"
       newsArray = stockData.news.split("#<IEX::Resources::News ")
         newsArray.shift()
-        // console.log(newsArray)
-
         newsArray.forEach(i => {
-
           i.slice(1, -3)
-
           let keyVal = i.split("=");
-            // console.log(keyVal[3])
           obj = { }
           obj["date"] = keyVal[1].slice(0, -9)
           obj["headline"] = keyVal[2].slice(1, -1)
           obj["body"] = keyVal[5].slice(1, -5)
           obj["src"] = keyVal[6].slice(1, -8)
-
 
            li = document.createElement('li')
            li.innerHTML =
@@ -47,7 +51,6 @@ document.addEventListener("DOMContentLoaded", function(e){
                <p>${obj.body}<br>source: ${obj.src}</p><br>
               `
                stockNewsUl.append(li)
-
         })
       moreInfo.innerHTML = `
         <p>Total volume: ${stockData.avg_total_volume}</p>
@@ -63,65 +66,139 @@ document.addEventListener("DOMContentLoaded", function(e){
       `
       moreInfo.append(stockNewsUl)
       stockDiv.append(moreInfo)
+
       // stockDiv.append(stockNewsUl)
       e.target.className = "hide-info"
-      e.target.textContent = "Hide Info"
+      e.target.textContent = "Hide Maket Data"
+      if (stockCollection.id !== "myStocks"){
+        button = document.createElement("button")
+        button.setAttribute("type", "submit")
+        button.setAttribute("id", "trackButton")
+        button.textContent = "Start Tracking"
+        console.log(stockDiv)
+        stockDiv.childNodes[6].append(button)
+      }
+       console.log(stockCollection.id)
+
+    console.log(stockDiv.childNodes[6])
     } else if (e.target.className === "hide-info"){
+
       const moreInfo = document.querySelector(".more-info")
       moreInfo.remove()
       e.target.className = "show-info"
-      e.target.textContent = "Show Info"
-    } else if (e.target.id === "signUpButton") {
-          e.preventDefault()
-                userName = (e.target.parentNode.childNodes[3].value)
-                userPassword = (e.target.parentNode.childNodes[7].value)
-          fetch("http://localhost:3000/api/v1/users",{
-          method: "POST",
-          headers: {
-          'Content-Type' : 'application/json'
-            },
-          body: JSON.stringify({
-            "name": userName,
-            "password": userPassword
-          })
-        })
-         .then(response => response)
-         .then(data => {
-           console.log('Success:', data);
-            renderUserPage(userName)
- 
-           })
-         .catch((error) => {
-           console.error('Error:', error);
-         })
-       getUserStocks()
+      e.target.textContent = "View Market Data"
+
+    } else if (e.target.id === "signUp") {
+      userName = e.target.parentNode.childNodes[3][0].value
+      userPassword = e.target.parentNode.childNodes[3][1].value
+           signUp(userName, userPassword)
+
     } else if (e.target.id === "myStocks") {
-        getUserStocks()
+
+        getUser()
 
     } else if (e.target.id === "logOut") {
+
       console.log("logout")
+
+    } else if (e.target.id === "logIn") {
+      e.preventDefault()
+            userName = e.target.parentNode.childNodes[3][0].value
+            userPassword = e.target.parentNode.childNodes[3][1].value
+      setSession(userName, userPassword)
+
     }
   })
- function getUserStocks(){
+function signUp(userName, userPassword){
+  fetch("http://localhost:3000/api/v1/users",{
+  method: "POST",
+  headers: {
+  'Content-Type' : 'application/json'
+    },
+  body: JSON.stringify({
+    "name": userName,
+    "password": userPassword
+  })
+})
+ .then(response => response.json())
+ .then(data => {
+   console.log(data);
+   errors = []
+     if(Array.isArray(data)){
+       renderForm("signUp")
+       form = document.querySelector(".form")
+        data.forEach(e => {
+          console.log(e)
+          errors.push(" " + e)
+        });
+       form.innerHTML += errors
+     } else {
+       console.log('Success:', data);
+       setSession(userName, userPassword)
+      }
+   })
+ .catch((error) => {
+   console.error('Error:', error);
+ })
+}
+function setSession(userName, userPassword){
+  fetch("http://localhost:3000/api/v1/sessions",{
+  method: "POST",
+  headers: {
+  'Content-Type' : 'application/json'
+    },
+  body: JSON.stringify({
+    "name": userName,
+    "password": userPassword
+  })
+})
+ .then(response => response.json())
+ .then(data => {
+   // console.log('Success:', data);
+   console.log(e.target)
+   if(Array.isArray(data)){
+     renderForm("signUp")
+     form = document.querySelector(".form")
+      data.forEach(e => {
+        console.log(e)
+        errors.push(" " + e)
+      });
+     form.innerHTML += errors
+     } else {
+       console.log('Success:', data);
+       renderUserPage(userName, data)
+      }
+   })
+ .catch((error) => {
+   console.error('Error:', error);
+ })
+
+}
+
+ function getUser(){
+   user = {}
    stockCollection.innerHTML = ""
    const userStocksUrl = `http://localhost:3000/api/v1/users/${userName}`
    fetch(userStocksUrl)
    .then(response => response.json())
    .then(data => {
-     renderStocks(data)
+     console.log(data)
+     renderStocks(data.stocks)
   })
-
  }
 
- function renderUserPage(userName){
+ function renderUserPage(userName, userStocks){
+   console.log(userName)
+   console.log(userStocks.length)
    stockCollection.innerHTML = `<h3>Welcome ${userName}!`
+   stockCollection.setAttribute("id", "myStocks")
 
    const myStocks = document.createElement("li")
    const logOut = document.createElement("li")
 
    const signUp = document.getElementById('signUp')
    const logIn = document.getElementById('logIn')
-   const onTheMove = document.getElementById("onTheMove")
+   const onTheMove = document.getElementById("onTheMoveNav")
 
    myStocks.setAttribute("id", "myStocks")
    myStocks.innerHTML = "My Stocks"
@@ -136,29 +213,32 @@ document.addEventListener("DOMContentLoaded", function(e){
    navBarUl.prepend(logOut)
    navBarUl.prepend(onTheMove)
    navBarUl.prepend(myStocks)
+    renderStocks(userStocks)
 
+}
 
-  }
-
- function renderSignUp(){
+ function renderForm(s){
       e.preventDefault()
 
       stockCollection.innerHTML = ""
       signUpdiv = document.createElement("div")
+      button = document.createElement("button")
+      button.setAttribute("type", "submit")
+      button.setAttribute("id", `${s}`)
+      button.textContent = "go"
       signUpdiv.setAttribute("class", "form")
       signUpdiv.innerHTML= `
-       <h1>Sign Up</h1>
-       <form class="search-form" action="index.html" method="post">
-          <label for="user-name-input">username</label>
+       <h1>ENTER</h1>
+       <form class="form" action="index.html" method="post">
+          <label for="user-name-input">Username:</label>
          <input type="text" id="user-name-input" name="user-name-input">
 
-         <label for="user-password-input">password</label>
+         <label for="user-password-input">Password:</label>
         <input type="password" id="user-password-input" name="user-password-input">
-
-         <input type="submit" id="signUpButton" value="submit">
        </form>
 `
 
+      signUpdiv.append(button)
       stockCollection.append(signUpdiv)
     }
 
@@ -222,15 +302,22 @@ document.addEventListener("DOMContentLoaded", function(e){
   }
 
  function renderStocks(stocks){
+   console.log(stocks)
+   if (stocks === undefined) {
+     console.log("you are not tracking any stocks.")
+   } else {
       stocks.forEach(stock =>{
-
            renderStock(stock)
-              })
-    }
+    })
+   }
+  }
 
  function renderStock(stock){
-      const stockDiv = document.createElement('div')
-
+    const stockDiv = document.createElement('div')
+    button = document.createElement("button")
+    button.setAttribute("type", "submit")
+    button.setAttribute("id", `${stock.symbol}`)
+    button.textContent = "View Market Data"
       // stockImg.src = img.url
       // stockNewsUl.className = "stock-news"
     // stockImg.src = stock.logo_url
@@ -238,7 +325,7 @@ document.addEventListener("DOMContentLoaded", function(e){
 
     stockDiv.innerHTML = `
     <h1>${stock.company_name}</h1><br>
-    <button class="show-info">Show Info</button>
+    <button class="show-info">View Market Data</button>
     `
     stockDiv.className = "each-stock"
     stockDiv.dataset.avg_total_volume = `${stock.avg_total_volume}`
@@ -254,11 +341,11 @@ document.addEventListener("DOMContentLoaded", function(e){
     stockDiv.setAttribute(`id`, `${stock.symbol}`)
     // stockDiv.prepend(stockImg)
         // stockDiv.append(stockNewsUl)
+
+
         stockCollection.append(stockDiv)
-        setStockImage(stock.symbol)
+        // setStockImage(stock.symbol)
 
     }
-
-
 
 })
