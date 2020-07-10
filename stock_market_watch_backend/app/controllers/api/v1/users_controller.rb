@@ -8,6 +8,7 @@ class Api::V1::UsersController < ApplicationController
     u_params["password"] = params["password"]
     puts u_params
           user = User.new(u_params)
+          user.save
           if user.save
             puts "ok"
             puts u_params
@@ -23,7 +24,7 @@ class Api::V1::UsersController < ApplicationController
   def show
     if @user
     render json: user
-    puts "ok √"
+    puts "ok "
    else
     render json: "user not found"
    end

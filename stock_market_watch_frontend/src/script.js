@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function(e){
   document.addEventListener("click", function(e){
     e.preventDefault()
 
-    if (e.target.id === "onTheMove"){
+    if (e.target.id === "onTheMoveNav"){
       stockCollection.innerHTML = ""
       stockCollection.setAttribute("id", "onTheMove")
       getStocks()
@@ -107,6 +107,8 @@ document.addEventListener("DOMContentLoaded", function(e){
             userPassword = e.target.parentNode.childNodes[3][1].value
       setSession(userName, userPassword)
 
+    } else if (e.target.id === "trackButton") {
+          
     }
   })
 function signUp(userName, userPassword){
@@ -155,17 +157,13 @@ function setSession(userName, userPassword){
  .then(response => response.json())
  .then(data => {
    // console.log('Success:', data);
-   console.log(e.target)
-   if(Array.isArray(data)){
-     renderForm("signUp")
-     form = document.querySelector(".form")
-      data.forEach(e => {
-        console.log(e)
-        errors.push(" " + e)
-      });
-     form.innerHTML += errors
+     if(data[0] === "wrong password or username"){
+       renderForm("signIn")
+       form = document.querySelector(".form")
+       form.innerHTML += `<br><h3style="text-align:center">${data[0]}<h3>`
      } else {
        console.log('Success:', data);
+
        renderUserPage(userName, data)
       }
    })
@@ -303,12 +301,12 @@ function setSession(userName, userPassword){
 
  function renderStocks(stocks){
    console.log(stocks)
-   if (stocks === undefined) {
-     console.log("you are not tracking any stocks.")
-   } else {
-      stocks.forEach(stock =>{
-           renderStock(stock)
+   if(Array.isArray(stocks)){
+     stocks.forEach(stock =>{
+          renderStock(stock)
     })
+   } else {
+    console.log("you are not tracking any stocks.")
    }
   }
 
