@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", function(e){
     } else if (e.target.className === "show-info"){
       const stockDiv = e.target.parentNode
       const stockData = e.target.parentNode.dataset
+      console.log(stockData)
       const moreInfo = document.createElement('div')
-      const stockNewsUl = document.createElement('ul')
 
       moreInfo.className = "more-info"
         e.target.textContent = "Hide Market Data"
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function(e){
              `<h3>${obj.headline}</h3><br>
                <p>${obj.body}<br>source: ${obj.src}</p><br>
               `
-               stockNewsUl.append(li)
+               // stockNewsUl.append(li)
         })
       moreInfo.innerHTML = `
         <p>Total volume: ${stockData.avg_total_volume}</p>
@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function(e){
         <p>YTD change: ${stockData.ytd_change}</p>
         <p>News: </p>
       `
-      moreInfo.append(stockNewsUl)
+      // moreInfo.append(stockNewsUl)
       stockDiv.append(moreInfo)
 
       // stockDiv.append(stockNewsUl)
@@ -130,10 +130,29 @@ document.addEventListener("DOMContentLoaded", function(e){
       setSession(userName, userPassword)
 
     } else if (e.target.id === "trackButton") {
+                e.target.value = "Stop Tracking"
                 tracker(e)
     }
 
   })
+function renderNews(newsArray){
+  const stockNewsUl = document.createElement('ul')
+  stockNewsUl.setAttribute("class", "newsUl")
+  newsArray.forEach(i => {
+    newsDiv = document.createElement("div");
+    newsImg = document.createElement("img");
+    newsImg.src = i.image
+    newsImg.style.width = '50%';
+    newsImg.style.width = '50%';
+    newsDiv.innerHTML = `<li class="newsLi"><h1>${i.headline}</h1><br><p>${i.summary}</p><br><p>${i.source}</li>`
+
+   stockNewsUl.append(newsImg)
+   stockNewsUl.append(newsDiv)
+    console.log(stockNewsUl)
+  });
+  return stockNewsUl;
+}
+
 function logOut(userName){
   fetch("http://localhost:3000/api/v1/sessions",{
   method: "DELETE",
@@ -162,9 +181,46 @@ function logOut(userName){
  })
 
 }
+
+function searchtracker(e){
+        let stockObj = {}
+         let x = []
+         console.log()
+        stockObj[`"symbol"`] = searchInput.value
+        stockObj[`"user_name"`] = userName
+        console.log(stockObj)
+        fetch("http://localhost:3000/api/v1/user_stocks",{
+        method: "POST",
+        headers: {
+        'Content-Type' : 'application/json'
+          },
+        body: JSON.stringify({
+             stockObj
+        })
+      })
+       .then(response => response.json())
+       .then(data => {
+              console.log('Success:', data);
+              if (data.message) {
+               x.push(data.message)
+             } else {
+              data.forEach(i => {
+                getStock(i["symbol"])
+                console.log(i["symbol"])
+              });
+            }
+            stockCollection.childNodes[0].prepend(x[0])
+         })
+       .catch((error) => {
+         console.error('Error:', error);
+       })
+
+   }
+
 function tracker(e){
+        console.log(e.path[4])
         const stockDataArray = e.target.parentNode.childNodes[15].innerText.split(": ");
-         console.log(stockDataArray)
+
          let stockObj = {}
          let x = []
         stockObj[`"symbol"`] = stockDataArray[1]
@@ -185,9 +241,9 @@ function tracker(e){
               data.forEach(i => {
                 getStock(i["symbol"])
                 console.log(i["symbol"])
-                x.push(i)
+                x.push(data)
               });
-
+         stockCollection.innerHTML += x[0].message
          })
        .catch((error) => {
          console.error('Error:', error);
@@ -374,7 +430,9 @@ function renderUserStocks(stock){
            <b>ytd change:</b> ${stock.quote.ytdChange}<br>
            <b>news:</b><br>
            `
+           news = renderNews(stock.news)
            stockDiv.prepend(searchImg)
+           stockDiv.append(news)
            userStocksUl.append(stockDiv)
            stockCollection.append(userStocksUl)
 
@@ -392,23 +450,31 @@ function renderSearch(stock){
         stockDiv.setAttribute("class", "each-stock")
         stockDiv.innerHTML = `
         <h1>${stock.quote.companyName}</h1><br>
-        <b>avg total volume:</b> ${stock.quote.avgTotalVolume}<br>
-        <b>change percent:</b> ${stock.quote.changePercent}<br>
-        <b>latest price:</b> ${stock.quote.latestPrice}<br>
-        <b>latest update:</b> ${stock.quote.latestTime}<br>
-        <b>market cap:</b> ${stock.quote.marketCap}<br>
-        <b>pe ratio:</b> ${stock.quote.peRatio}<br>
-        <b>primary exchange:</b> ${stock.quote.primaryExchange}<br>
-        <b>symbol:</b> ${stock.quote.symbol}<br>
-        <b>week52High:</b> ${stock.quote.week52High}<br>
-        <b>week52Low:</b> ${stock.quote.week52Low}<br>
-        <b>ytd change:</b> ${stock.quote.ytdChange}<br>
-        <b>news:</b><br>
+        <b>avg total volume: </b>${stock.quote.avgTotalVolume}<br>
+        <b>change percent: </b>${stock.quote.changePercent}<br>
+        <b>latest price: </b>${stock.quote.latestPrice}<br>
+        <b>latest update: </b>${stock.quote.latestTime}<br>
+        <b>market cap: </b>${stock.quote.marketCap}<br>
+        <b>pe ratio: </b>${stock.quote.peRatio}<br>
+        <b>primary exchange: </b> ${stock.quote.primaryExchange}<br>
+        <b>symbol: </b>${stock.quote.symbol}<br>
+        <b>week52High: </b>${stock.quote.week52High}<br>
+        <b>week52Low: </b>${stock.quote.week52Low}<br>
+        <b>ytd change: </b>${stock.quote.ytdChange}<br>
+        <b>-</b><br>
         `
         stockDiv.prepend(searchImg)
         userStocksUl.append(stockDiv)
         stockCollection.append(userStocksUl)
-
+        button = document.createElement("button")
+        button.setAttribute("type", "submit")
+        button.setAttribute("id", "trackButton")
+        button.textContent = "Start Tracking"
+        button.addEventListener("click", function(e){
+            searchtracker(e)
+        });
+        stockDiv.childNodes[49].append(button)
+        console.log(stockDiv.childNodes[49])
     }
 
 function setStockImage(stockSymbol){
