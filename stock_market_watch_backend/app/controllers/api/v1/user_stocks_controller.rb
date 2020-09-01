@@ -21,7 +21,7 @@ def create
   else
   @stock = Stock.create(symbol: params[:stockObj][:"\"symbol\""])
   @current_user.stocks.push(@stock)
-  render json: @current_user.stocks
+  render json: @current_user
   end
 
 end

@@ -13,6 +13,10 @@ class Api::V1::StocksController < ApplicationController
     endpoint: 'https://cloud.iexapis.com/v1'
   )
 
+  def create 
+    stock = Stock.create(stock_params)
+    render json: stock
+  end 
 
   def index
     top_ten = @@client.stock_market_list(:mostactive)
@@ -22,6 +26,12 @@ class Api::V1::StocksController < ApplicationController
   def show
     logo = @@client.logo("#{params[:id]}")
     render json: logo.url
+  end
+
+  private 
+
+  def stock_params
+    params.require(:stock).permit! 
   end
 
 end
