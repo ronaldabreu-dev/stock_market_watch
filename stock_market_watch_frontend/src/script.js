@@ -120,6 +120,7 @@ function renderNews(newsArray){
     newsDiv = document.createElement("div");
     newsImg = document.createElement("img");
     newsImg.src = i.image
+    newsImg.href = "${i.url}"
     newsImg.setAttribute("class", "news-img")
     newsDiv.setAttribute("class", "news-div")
     newsDiv.innerHTML = `

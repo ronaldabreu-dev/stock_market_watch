@@ -8,8 +8,6 @@
 }
 
 .logo {
-  /* width: 500px;
-  height: 500px; */
   width: 25%;
   display: block;
   margin-left: auto;
@@ -112,7 +110,6 @@ font-family: "Helvetica", sans-serif;
 
  .each-stock {
    text-align: center;
-   /* width: 25%; */
    border: 1px solid #333;
    box-shadow: 8px 8px 5px #444;
    padding: 8px 12px;
@@ -122,8 +119,6 @@ font-family: "Helvetica", sans-serif;
 
  #onTheMove {
   display: block;
-  /* justify-content: space-around;
-  flex-wrap: wrap; */
  }
 
  .news-img {
